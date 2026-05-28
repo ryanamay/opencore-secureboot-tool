@@ -11,14 +11,18 @@ echo ""
 check_and_install() {
     local package=$1
     local command=$2
+    # Optional per-manager package names; default to $package when omitted
+    local apt_pkg=${3:-$package}
+    local dnf_pkg=${4:-$package}
+    local pacman_pkg=${5:-$package}
     if ! command -v $command &>/dev/null; then
         echo "INFO: $package not found, installing..."
         if command -v apt-get &>/dev/null; then
-            sudo apt-get install -y $package
+            sudo apt-get install -y $apt_pkg
         elif command -v dnf &>/dev/null; then
-            sudo dnf install -y $package
+            sudo dnf install -y $dnf_pkg
         elif command -v pacman &>/dev/null; then
-            sudo pacman -S --noconfirm $package
+            sudo pacman -S --noconfirm $pacman_pkg
         else
             echo "ERROR: Unable to install $package, please install manually!"
             exit 1
@@ -101,7 +105,8 @@ if [ "$(uname)" != "Linux" ]; then
     exit 1
 fi
 
-check_and_install efitools sbsign
+check_and_install efitools sign-efi-sig-list
+check_and_install sbsigntool sbsign sbsigntool sbsigntools sbsigntools
 check_and_install curl curl
 check_and_install wget wget
 check_and_install openssl openssl
